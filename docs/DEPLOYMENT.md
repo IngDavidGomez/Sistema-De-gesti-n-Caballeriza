@@ -58,7 +58,7 @@ Render genera `JWT_SECRET` durante la creación del Blueprint. Cambiar este secr
 MAIL_MODE=smtp
 MAIL_FROM=no-reply@example.com
 SMTP_HOST=smtp.example.com
-SMTP_PORT=587
+SMTP_PORT=2525
 SMTP_USERNAME=<usuario>
 SMTP_PASSWORD=<secreto>
 ```
