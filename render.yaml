@@ -36,9 +36,11 @@ services:
       - key: STORAGE_PROVIDER
         value: local
       - key: MAIL_MODE
-        value: smtp
+        value: brevo
       - key: MAIL_FROM
         value: caballerizaestablo@gmail.com
+      - key: BREVO_API_KEY
+        sync: false
       - key: SPRING_MAIL_HOST
         value: smtp-relay.brevo.com
       - key: SPRING_MAIL_PORT

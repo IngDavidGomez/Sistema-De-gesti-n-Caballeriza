@@ -52,7 +52,17 @@ Render genera `JWT_SECRET` durante la creación del Blueprint. Cambiar este secr
 
 `STORAGE_PUBLIC_URL` debe apuntar al dominio público o CDN del bucket. Para desarrollo use `STORAGE_PROVIDER=local`; las imágenes quedan en un volumen persistente.
 
-## Correo SMTP
+## Correo transaccional
+
+En Render se recomienda la API HTTPS de Brevo, ya que evita las restricciones y bloqueos habituales de los puertos SMTP:
+
+```env
+MAIL_MODE=brevo
+MAIL_FROM=no-reply@example.com
+BREVO_API_KEY=<secreto>
+```
+
+SMTP continúa disponible como alternativa:
 
 ```env
 MAIL_MODE=smtp
@@ -63,7 +73,7 @@ SMTP_USERNAME=<usuario>
 SMTP_PASSWORD=<secreto>
 ```
 
-En desarrollo, `MAIL_MODE=log` evita dependencias externas y registra tanto los enlaces de recuperación como los envíos de reportes sin entregar correos reales. Para que la opción **Enviar por correo** entregue el PDF al personal, configure `MAIL_MODE=smtp` y credenciales SMTP válidas. Nunca versionar el archivo `.env`.
+En desarrollo, `MAIL_MODE=log` evita dependencias externas y registra tanto los enlaces de recuperación como los envíos de reportes sin entregar correos reales. Para que la opción **Enviar por correo** entregue el PDF al personal, configure `MAIL_MODE=brevo` con una clave API o `MAIL_MODE=smtp` con credenciales SMTP válidas. Nunca versionar claves en `.env`, GitHub ni `render.yaml`.
 
 ## Migraciones
 
