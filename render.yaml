@@ -19,6 +19,14 @@ services:
         value: 5
       - key: DB_POOL_MIN_IDLE
         value: 0
+      - key: APP_SEED_ENABLED
+        value: false
+      - key: SPRING_MAIN_LAZY_INITIALIZATION
+        value: true
+      - key: SPRING_DATA_JPA_REPOSITORIES_BOOTSTRAP_MODE
+        value: lazy
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=70 -XX:+UseSerialGC -XX:TieredStopAtLevel=1
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
