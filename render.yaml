@@ -36,7 +36,17 @@ services:
       - key: STORAGE_PROVIDER
         value: local
       - key: MAIL_MODE
-        value: log
+        value: smtp
+      - key: MAIL_FROM
+        value: caballerizaestablo@gmail.com
+      - key: SPRING_MAIL_HOST
+        value: smtp-relay.brevo.com
+      - key: SPRING_MAIL_PORT
+        value: 587
+      - key: SPRING_MAIL_USERNAME
+        value: afc14a001@smtp-brevo.com
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
 
   - type: web
     name: establo-horizonte-web
