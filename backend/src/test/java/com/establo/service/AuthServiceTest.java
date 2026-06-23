@@ -1,0 +1,8 @@
+package com.establo.service;
+import com.establo.dto.AuthDto;import com.establo.entity.*;import com.establo.exception.BusinessException;import com.establo.repository.UserRepository;import com.establo.security.JwtService;import org.junit.jupiter.api.Test;import org.springframework.security.authentication.AuthenticationManager;import org.springframework.security.crypto.password.PasswordEncoder;
+import static org.assertj.core.api.Assertions.*;import static org.mockito.ArgumentMatchers.any;import static org.mockito.Mockito.*;
+class AuthServiceTest{
+  UserRepository users=mock(UserRepository.class);PasswordEncoder encoder=mock(PasswordEncoder.class);JwtService jwt=mock(JwtService.class);AuthenticationManager auth=mock(AuthenticationManager.class);AuthService service=new AuthService(users,encoder,jwt,auth);
+  @Test void publicRegistrationAlwaysCreatesClient(){when(encoder.encode("Password1!")).thenReturn("hash");when(users.save(any())).thenAnswer(i->{var u=(User)i.getArgument(0);u.setId(4L);return u;});when(jwt.generate(any())).thenReturn("jwt");var response=service.register(new AuthDto.Register("Ana","ANA@TEST.COM","Password1!"));var captor=org.mockito.ArgumentCaptor.forClass(User.class);verify(users).save(captor.capture());assertThat(captor.getValue().getRole()).isEqualTo(Role.CLIENT);assertThat(captor.getValue().getEmail()).isEqualTo("ana@test.com");assertThat(response.role()).isEqualTo(Role.CLIENT);}
+  @Test void rejectsDuplicateEmail(){when(users.existsByEmailIgnoreCase("a@test.com")).thenReturn(true);assertThatThrownBy(()->service.register(new AuthDto.Register("Ana","a@test.com","Password1!"))).isInstanceOf(BusinessException.class).hasMessageContaining("registrado");verify(users,never()).save(any());}
+}

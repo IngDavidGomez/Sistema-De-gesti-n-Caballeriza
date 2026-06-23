@@ -1,0 +1,1 @@
+package com.establo.repository;import com.establo.entity.WorkShift;import org.springframework.data.jpa.repository.JpaRepository;import java.util.Optional;public interface WorkShiftRepository extends JpaRepository<WorkShift,Long>{Optional<WorkShift> findByNameIgnoreCase(String name);}

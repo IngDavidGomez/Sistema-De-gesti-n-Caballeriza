@@ -1,0 +1,3 @@
+package com.establo.config;
+import com.establo.repository.UserRepository;import lombok.RequiredArgsConstructor;import org.springframework.context.annotation.*;import org.springframework.security.core.authority.SimpleGrantedAuthority;import org.springframework.security.core.userdetails.*;import java.util.List;
+@Configuration @RequiredArgsConstructor public class UserDetailsConfig {private final UserRepository users;@Bean UserDetailsService userDetailsService(){return email->{var u=users.findByEmailIgnoreCase(email).orElseThrow(()->new UsernameNotFoundException("Usuario no encontrado"));return new org.springframework.security.core.userdetails.User(u.getEmail(),u.getPassword(),u.isActive(),true,true,true,List.of(new SimpleGrantedAuthority("ROLE_"+u.getRole().name())));};}}

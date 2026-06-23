@@ -1,0 +1,5 @@
+package com.establo.database;
+import org.flywaydb.core.Flyway;import org.junit.jupiter.api.Test;import java.sql.DriverManager;import static org.assertj.core.api.Assertions.*;
+class DatabaseMigrationTest{
+ @Test void migratesFreshDatabaseToNormalizedSchema()throws Exception{String url="jdbc:h2:mem:migration;MODE=PostgreSQL;DB_CLOSE_DELAY=-1";var result=Flyway.configure().dataSource(url,"sa","").locations("classpath:db/migration").load().migrate();assertThat(result.success).isTrue();assertThat(result.migrationsExecuted).isGreaterThanOrEqualTo(4);try(var c=DriverManager.getConnection(url,"sa","");var s=c.createStatement()){assertThat(s.executeQuery("SELECT COUNT(*) FROM work_shift").next()).isTrue();assertThat(s.executeQuery("SELECT COUNT(*) FROM employee_task").next()).isTrue();var columns=c.getMetaData().getColumns(null,null,"EMPLOYEE",null);var names=new java.util.HashSet<String>();while(columns.next())names.add(columns.getString("COLUMN_NAME"));assertThat(names).contains("SHIFT_ID").doesNotContain("SHIFT","TASKS");}}
+}

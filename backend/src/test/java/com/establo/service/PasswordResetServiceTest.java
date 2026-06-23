@@ -1,0 +1,13 @@
+package com.establo.service;
+import com.establo.entity.*;import com.establo.exception.BusinessException;import com.establo.repository.*;
+import org.junit.jupiter.api.*;import org.mockito.*;import org.springframework.security.crypto.password.PasswordEncoder;import org.springframework.test.util.ReflectionTestUtils;
+import java.time.LocalDateTime;import java.util.Optional;
+import static org.assertj.core.api.Assertions.*;import static org.mockito.Mockito.*;
+class PasswordResetServiceTest{
+  UserRepository users=mock(UserRepository.class);PasswordResetTokenRepository tokens=mock(PasswordResetTokenRepository.class);PasswordEncoder encoder=mock(PasswordEncoder.class);EmailService email=mock(EmailService.class);PasswordResetService service;
+  @BeforeEach void setup(){service=new PasswordResetService(users,tokens,encoder,email);ReflectionTestUtils.setField(service,"frontendUrl","http://web.test");}
+  @Test void requestDoesNotRevealUnknownEmail(){when(users.findByEmailIgnoreCase("missing@test.com")).thenReturn(Optional.empty());service.request("missing@test.com");verifyNoInteractions(tokens,email);}
+  @Test void createsHashedExpiringTokenAndSendsLink(){var user=User.builder().id(2L).name("Ana").email("ana@test.com").active(true).build();when(users.findByEmailIgnoreCase(user.getEmail())).thenReturn(Optional.of(user));service.request(user.getEmail());var captor=ArgumentCaptor.forClass(PasswordResetToken.class);verify(tokens).save(captor.capture());assertThat(captor.getValue().getTokenHash()).hasSize(64);assertThat(captor.getValue().getExpiresAt()).isAfter(LocalDateTime.now().plusMinutes(29));verify(email).sendPasswordReset(eq(user.getEmail()),eq("Ana"),startsWith("http://web.test/restablecer-contrasena?token="));}
+  @Test void resetsPasswordAndConsumesValidToken(){var user=User.builder().id(2L).password("old").build();var token=PasswordResetToken.builder().user(user).expiresAt(LocalDateTime.now().plusMinutes(2)).createdAt(LocalDateTime.now()).build();when(tokens.findByTokenHash(service.hash("raw"))).thenReturn(Optional.of(token));when(encoder.encode("Nueva123!")).thenReturn("encoded");service.reset("raw","Nueva123!");assertThat(user.getPassword()).isEqualTo("encoded");assertThat(token.getUsedAt()).isNotNull();verify(users).save(user);}
+  @Test void rejectsExpiredToken(){var token=PasswordResetToken.builder().expiresAt(LocalDateTime.now().minusSeconds(1)).createdAt(LocalDateTime.now().minusHours(1)).build();when(tokens.findByTokenHash(service.hash("expired"))).thenReturn(Optional.of(token));assertThatThrownBy(()->service.reset("expired","Nueva123!")).isInstanceOf(BusinessException.class).hasMessageContaining("venció");verifyNoInteractions(encoder);}
+}

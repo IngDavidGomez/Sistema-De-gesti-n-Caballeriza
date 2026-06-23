@@ -1,0 +1,1 @@
+package com.establo.repository;import com.establo.entity.EmployeeTask;import org.springframework.data.jpa.repository.JpaRepository;public interface EmployeeTaskRepository extends JpaRepository<EmployeeTask,Long>{}
