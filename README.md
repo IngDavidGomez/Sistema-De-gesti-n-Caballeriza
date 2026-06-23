@@ -11,7 +11,7 @@ El repositorio está separado en dos aplicaciones:
 
 El entorno local usa H2 persistente para reducir requisitos de instalación. El perfil `prod` utiliza PostgreSQL; Flyway V1-V4 es la única fuente de verdad del esquema relacional. Swagger documenta los contratos directamente desde la API.
 
-Documentación ampliada: [API y ejemplos](docs/API.md), [arquitectura de base de datos](docs/DATABASE.md), [despliegue, S3 y SMTP](docs/DEPLOYMENT.md) y [trazabilidad de requisitos](docs/TRACEABILITY.md).
+Documentación ampliada: [API y ejemplos](docs/API.md), [arquitectura de base de datos](docs/DATABASE.md), [despliegue, S3 y SMTP](docs/DEPLOYMENT.md), [calidad con SonarQube](docs/QUALITY.md) y [trazabilidad de requisitos](docs/TRACEABILITY.md).
 
 ## Modelo de datos
 
@@ -106,6 +106,18 @@ npm run build
 ```
 
 Las pruebas backend verifican stock, cupos, horarios y movimientos de suministros. Vitest y Testing Library verifican filtrado y acciones de componentes React; el build valida el empaquetado completo.
+
+## SonarQube y cobertura
+
+El repositorio incluye análisis estático unificado para backend y frontend. SonarQube se ejecuta en Docker con una base PostgreSQL independiente; JaCoCo genera la cobertura Java y Vitest genera LCOV para React.
+
+```powershell
+docker compose --profile quality up -d sonarqube
+```
+
+Después de crear un token en `http://localhost:9000`, seguir la guía completa en [docs/QUALITY.md](docs/QUALITY.md). Los servicios de calidad son opcionales y no afectan el despliegue normal de la aplicación.
+
+En Windows, `scripts/sonar-analysis.ps1` automatiza el arranque, las pruebas, la cobertura y el escaneo.
 
 ## Guion sugerido para video (máximo 5 minutos)
 
