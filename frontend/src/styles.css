@@ -2780,6 +2780,101 @@ tbody tr:hover {
   transform: none;
   opacity: 0.55;
 }
+.report-controls .email-action {
+  border-color: #4f806f;
+  color: #356b59;
+}
+.report-email-form {
+  padding: 22px 24px 24px;
+}
+.report-email-form > p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.report-recipient-heading,
+.report-email-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.report-recipient-heading {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+.report-recipient-heading button {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+.report-recipient-list {
+  max-height: 330px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.report-recipient {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.report-recipient:last-child {
+  border-bottom: 0;
+}
+.report-recipient:hover {
+  background: var(--surface-soft);
+}
+.report-recipient input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--primary);
+}
+.report-recipient span {
+  display: grid;
+  gap: 3px;
+}
+.report-recipient b {
+  font-size: 13px;
+}
+.report-recipient small,
+.report-recipient-empty {
+  color: var(--muted);
+  font-size: 11px;
+}
+.report-recipient-empty {
+  display: block;
+  padding: 30px;
+  text-align: center;
+}
+.report-email-actions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.report-email-actions > span {
+  margin-right: auto;
+  color: var(--muted);
+  font-size: 11px;
+}
+.report-email-actions button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.report-email-actions .primary {
+  color: #fff;
+}
 :root[data-theme='dark'] .report-tabs,
 :root[data-theme='dark'] .report-controls button,
 :root[data-theme='dark'] .report-kpi {

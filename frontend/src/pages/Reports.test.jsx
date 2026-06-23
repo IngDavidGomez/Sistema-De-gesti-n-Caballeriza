@@ -97,3 +97,41 @@ it('permite incluir todos los caballos en el reporte de salud', async () => {
     )
   );
 });
+it('envía el PDF al personal seleccionado', async () => {
+  api.mockImplementation((url) => {
+    if (url === '/reports/recipients')
+      return Promise.resolve([
+        {
+          id: 7,
+          name: 'Ana Vargas',
+          email: 'ana@establo.test',
+          role: 'CAREGIVER',
+        },
+      ]);
+    if (url === '/reports/email') return Promise.resolve({ sent: 1 });
+    const query = new URL(url, 'http://local').searchParams;
+    return Promise.resolve({
+      ...report,
+      from: query.get('from') || report.from,
+      to: query.get('to') || report.to,
+    });
+  });
+  render(<Reports />);
+  await screen.findByText('Atenciones vencidas');
+  fireEvent.click(screen.getByRole('button', { name: 'Enviar por correo' }));
+  fireEvent.click(await screen.findByRole('checkbox'));
+  fireEvent.click(screen.getByRole('button', { name: 'Enviar reporte' }));
+  await waitFor(() =>
+    expect(api).toHaveBeenCalledWith(
+      '/reports/email',
+      expect.objectContaining({ method: 'POST' })
+    )
+  );
+  const request = api.mock.calls.find(([url]) => url === '/reports/email')[1];
+  expect(JSON.parse(request.body)).toEqual(
+    expect.objectContaining({ recipientIds: [7], allHorses: false })
+  );
+  expect(
+    await screen.findByText('1 correo enviado correctamente')
+  ).toBeTruthy();
+});

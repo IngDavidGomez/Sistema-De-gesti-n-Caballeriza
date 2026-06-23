@@ -86,3 +86,22 @@ Accept: application/pdf
 ```
 
 El documento incluye resumen ejecutivo, cinco secciones tabulares, identidad visual, fecha de generación y numeración de páginas.
+
+Los usuarios activos disponibles como destinatarios se consultan con:
+
+```http
+GET /api/reports/recipients
+Authorization: Bearer <token>
+```
+
+Para generar el mismo PDF y enviarlo individualmente por correo:
+
+```http
+POST /api/reports/email
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{"recipientIds":[1,3],"from":"2026-06-01","to":"2026-06-30","allHorses":false}
+```
+
+Solo se aceptan identificadores de usuarios registrados y activos, con un máximo de 25 destinatarios por envío. Cada destinatario recibe un mensaje separado para no exponer las direcciones del resto del personal.

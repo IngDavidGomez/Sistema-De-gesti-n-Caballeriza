@@ -63,7 +63,7 @@ SMTP_USERNAME=<usuario>
 SMTP_PASSWORD=<secreto>
 ```
 
-En desarrollo, `MAIL_MODE=log` evita dependencias externas y escribe el enlace de recuperación en el log. Nunca versionar el archivo `.env`.
+En desarrollo, `MAIL_MODE=log` evita dependencias externas y registra tanto los enlaces de recuperación como los envíos de reportes sin entregar correos reales. Para que la opción **Enviar por correo** entregue el PDF al personal, configure `MAIL_MODE=smtp` y credenciales SMTP válidas. Nunca versionar el archivo `.env`.
 
 ## Migraciones
 

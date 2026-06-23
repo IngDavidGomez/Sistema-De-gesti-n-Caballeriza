@@ -6,6 +6,7 @@ import {
   Download,
   FileText,
   HeartPulse,
+  Mail,
   PackageSearch,
   Printer,
   RefreshCw,
@@ -13,7 +14,14 @@ import {
   Wheat,
 } from 'lucide-react';
 import { api, downloadApi } from '../api';
-import { DataTable, Field, PageHeader, Select, Toast } from '../components/UI';
+import {
+  DataTable,
+  Field,
+  Modal,
+  PageHeader,
+  Select,
+  Toast,
+} from '../components/UI';
 import { useI18n } from '../i18n';
 const iso = (d) => d.toISOString().slice(0, 10),
   today = new Date(),
@@ -45,6 +53,12 @@ export default function Reports() {
     [error, setError] = useState(''),
     [loading, setLoading] = useState(true),
     [pdfBusy, setPdfBusy] = useState(false),
+    [emailOpen, setEmailOpen] = useState(false),
+    [emailBusy, setEmailBusy] = useState(false),
+    [recipientsBusy, setRecipientsBusy] = useState(false),
+    [recipients, setRecipients] = useState([]),
+    [selectedRecipients, setSelectedRecipients] = useState([]),
+    [notice, setNotice] = useState(''),
     [healthScope, setHealthScope] = useState('period'),
     [appliedHealthScope, setAppliedHealthScope] = useState('period');
   const requestSequence = useRef(0);
@@ -235,6 +249,54 @@ export default function Reports() {
       setPdfBusy(false);
     }
   }
+  async function openEmail() {
+    setEmailOpen(true);
+    setRecipientsBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await api('/reports/recipients');
+      setRecipients(Array.isArray(response) ? response : []);
+      setSelectedRecipients([]);
+    } catch (e) {
+      setError(e.message);
+      setEmailOpen(false);
+    } finally {
+      setRecipientsBusy(false);
+    }
+  }
+  function toggleRecipient(id) {
+    setSelectedRecipients((current) =>
+      current.includes(id)
+        ? current.filter((value) => value !== id)
+        : [...current, id]
+    );
+  }
+  async function sendEmail(event) {
+    event.preventDefault();
+    if (!selectedRecipients.length || !data || !filtersApplied) return;
+    setEmailBusy(true);
+    setError('');
+    try {
+      const result = await api('/reports/email', {
+        method: 'POST',
+        body: JSON.stringify({
+          recipientIds: selectedRecipients,
+          from: data.from,
+          to: data.to,
+          allHorses: appliedHealthScope === 'all',
+        }),
+      });
+      setEmailOpen(false);
+      setNotice(
+        `${result.sent} ${result.sent === 1 ? 'correo enviado' : 'correos enviados'} correctamente`
+      );
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setEmailBusy(false);
+    }
+  }
   return (
     <>
       <PageHeader
@@ -242,6 +304,7 @@ export default function Reports() {
         subtitle="Indicadores para decisiones clínicas, logísticas y administrativas"
       />
       <Toast message={error} />
+      <Toast message={notice} type="success" />
       <div className="report-controls panel">
         <Field
           label="Desde"
@@ -273,6 +336,14 @@ export default function Reports() {
           <FileText size={16} />
           {pdfBusy ? 'Generando PDF...' : 'PDF completo'}
         </button>
+        <button
+          className="email-action"
+          onClick={openEmail}
+          disabled={!data || !filtersApplied}
+        >
+          <Mail size={16} />
+          Enviar por correo
+        </button>
         <button onClick={csv} disabled={!data || !filtersApplied}>
           <Download size={16} />
           CSV
@@ -285,6 +356,82 @@ export default function Reports() {
           Imprimir
         </button>
       </div>
+      {emailOpen && (
+        <Modal
+          title="Enviar reporte por correo"
+          onClose={() => !emailBusy && setEmailOpen(false)}
+        >
+          <form className="report-email-form" onSubmit={sendEmail}>
+            <p>
+              Se enviará el PDF completo del período <b>{date(data?.from)}</b>{' '}
+              al <b>{date(data?.to)}</b>.
+            </p>
+            <div className="report-recipient-heading">
+              <strong>Seleccione el personal destinatario</strong>
+              {recipients.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedRecipients(
+                      selectedRecipients.length === recipients.length
+                        ? []
+                        : recipients.map((recipient) => recipient.id)
+                    )
+                  }
+                >
+                  {selectedRecipients.length === recipients.length
+                    ? 'Quitar todos'
+                    : 'Seleccionar todos'}
+                </button>
+              )}
+            </div>
+            <div className="report-recipient-list">
+              {recipientsBusy ? (
+                <span className="report-recipient-empty">
+                  Cargando personal...
+                </span>
+              ) : recipients.length ? (
+                recipients.map((recipient) => (
+                  <label key={recipient.id} className="report-recipient">
+                    <input
+                      type="checkbox"
+                      checked={selectedRecipients.includes(recipient.id)}
+                      onChange={() => toggleRecipient(recipient.id)}
+                    />
+                    <span>
+                      <b>{recipient.name}</b>
+                      <small>
+                        {recipient.email} · {t(recipient.role)}
+                      </small>
+                    </span>
+                  </label>
+                ))
+              ) : (
+                <span className="report-recipient-empty">
+                  No hay personal activo con correo registrado.
+                </span>
+              )}
+            </div>
+            <div className="report-email-actions">
+              <span>{selectedRecipients.length} seleccionado(s)</span>
+              <button
+                type="button"
+                onClick={() => setEmailOpen(false)}
+                disabled={emailBusy}
+              >
+                Cancelar
+              </button>
+              <button
+                className="primary"
+                disabled={!selectedRecipients.length || emailBusy}
+              >
+                <Mail size={16} />
+                {emailBusy ? 'Enviando...' : 'Enviar reporte'}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
       <div className="report-tabs" role="tablist">
         {tabs.map(([key, label, Icon]) => (
           <button
