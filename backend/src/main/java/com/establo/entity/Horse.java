@@ -2,6 +2,8 @@ package com.establo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -18,6 +20,6 @@ public class Horse {
   private String photoContentType;
   private String photoFileName;
   private LocalDateTime photoUpdatedAt;
-  @Lob @Basic(fetch=FetchType.LAZY) private byte[] photoData;
+  @JdbcTypeCode(SqlTypes.BINARY) @Column(columnDefinition="bytea") private byte[] photoData;
   @Builder.Default private boolean active=true;
 }
