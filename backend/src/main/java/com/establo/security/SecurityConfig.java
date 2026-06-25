@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.*;
+import org.springframework.http.HttpMethod;
 import java.util.*;
 
 @Configuration @EnableMethodSecurity @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class SecurityConfig {
   @Bean SecurityFilterChain chain(HttpSecurity http)throws Exception{return http
     .csrf(csrf->csrf.disable()).cors(cors->cors.configurationSource(cors()))
     .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    .authorizeHttpRequests(auth->auth.requestMatchers("/","/api/auth/**","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**","/h2-console/**","/uploads/**","/demo-horses/**","/actuator/health","/actuator/health/**").permitAll().anyRequest().authenticated())
+    .authorizeHttpRequests(auth->auth.requestMatchers(HttpMethod.GET,"/api/horses/*/photo").permitAll().requestMatchers("/","/api/auth/**","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**","/h2-console/**","/uploads/**","/demo-horses/**","/actuator/health","/actuator/health/**").permitAll().anyRequest().authenticated())
     .headers(headers->headers.frameOptions(frame->frame.sameOrigin()))
     .addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class)
     .addFilterAfter(auditFilter,JwtAuthenticationFilter.class).build();}

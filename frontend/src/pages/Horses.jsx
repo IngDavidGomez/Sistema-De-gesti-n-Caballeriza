@@ -67,21 +67,21 @@ export default function Horses() {
     e.preventDefault();
     setMsg('');
     try {
-      let photoUrl = form.photoUrl;
-      if (photo) {
-        const data = new FormData();
-        data.append('file', photo);
-        photoUrl = (await api('/files/horses', { method: 'POST', body: data }))
-          .url;
-      }
-      await api('/horses' + (form.id ? `/${form.id}` : ''), {
+      const savedHorse = await api('/horses' + (form.id ? `/${form.id}` : ''), {
         method: form.id ? 'PUT' : 'POST',
         body: JSON.stringify({
           ...form,
-          photoUrl,
           weight: Number(form.weight),
         }),
       });
+      if (photo) {
+        const data = new FormData();
+        data.append('file', photo);
+        await api(`/horses/${savedHorse.id}/photo`, {
+          method: 'POST',
+          body: data,
+        });
+      }
       setForm(null);
       setPhoto(null);
       load();
@@ -139,6 +139,9 @@ export default function Horses() {
               {h.photoUrl ? (
                 <img
                   src={assetUrl(h.photoUrl)}
+                  onError={(event) => {
+                    event.currentTarget.style.display = 'none';
+                  }}
                   alt={`Fotografía de ${h.name}`}
                 />
               ) : (

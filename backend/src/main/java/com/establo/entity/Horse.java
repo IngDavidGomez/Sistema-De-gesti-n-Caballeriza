@@ -3,6 +3,7 @@ package com.establo.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Horse {
@@ -14,5 +15,9 @@ public class Horse {
   @Column(nullable=false) private String sex;
   private Double weight;
   private String photoUrl;
+  private String photoContentType;
+  private String photoFileName;
+  private LocalDateTime photoUpdatedAt;
+  @Lob @Basic(fetch=FetchType.LAZY) private byte[] photoData;
   @Builder.Default private boolean active=true;
 }
