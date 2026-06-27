@@ -76,6 +76,7 @@ No ejecute scripts manuales sobre una base administrada por Flyway. Cada cambio 
 | Método y ruta | Función |
 |---|---|
 | `POST /api/auth/login` | Autenticación y token JWT |
+| `POST /api/auth/google` | Autenticación con Google y token JWT interno |
 | `POST /api/auth/register` | Registro de cliente |
 | `GET/POST/PUT/DELETE /api/horses` | Gestión de caballos |
 | `GET /api/medical-records/horse/{id}` | Historial por caballo |
@@ -132,3 +133,18 @@ En Windows, `scripts/sonar-analysis.ps1` automatiza el arranque, las pruebas, la
 ## Seguridad
 
 Las contraseñas se almacenan con BCrypt. La API es stateless, usa JWT y aplica autorización tanto en endpoints como en rutas/acciones visibles del frontend. Cambie `JWT_SECRET` antes de desplegar, configure CORS para el dominio real y no versionar archivos `.env`.
+
+### Acceso con Google
+
+El login usa el botón oficial de Google Identity Services. El navegador entrega un ID token al backend, que valida criptográficamente la firma, el emisor, la expiración y la audiencia antes de emitir el JWT interno. El identificador estable `sub` de Google se conserva en `users.google_subject`; una cuenta nueva recibe el rol `CLIENT` y una cuenta existente mantiene su rol.
+
+1. En Google Cloud Console cree un **OAuth Client ID** de tipo **Web application**.
+2. Registre `http://localhost:5173` y `https://establo-horizonte-web.onrender.com` como **Authorized JavaScript origins**.
+3. Configure el mismo Client ID (no es un secreto) en ambos procesos:
+
+```powershell
+$env:GOOGLE_CLIENT_ID="000000000000-example.apps.googleusercontent.com"
+$env:VITE_GOOGLE_CLIENT_ID=$env:GOOGLE_CLIENT_ID
+```
+
+En Render, defina `GOOGLE_CLIENT_ID` en el backend y `VITE_GOOGLE_CLIENT_ID` en el frontend. El frontend debe reconstruirse después de cambiar una variable `VITE_*`. No se requiere Client Secret para este flujo mediante ID token.

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, authStore } from '../api';
 import { ShieldCheck } from 'lucide-react';
 import LoginHero from '../components/LoginHero';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 import { LanguageSelector, useI18n } from '../i18n';
 
 const DEMO_ACCOUNTS = [
@@ -44,6 +45,23 @@ export default function Login() {
       setBusy(false);
     }
   }
+  const googleLogin = useCallback(async (credential) => {
+    setBusy(true);
+    setError('');
+    try {
+      const data = await api('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ credential }),
+      });
+      authStore.set(data);
+      nav('/');
+    } catch (reason) {
+      setError(reason.message);
+    } finally {
+      setBusy(false);
+    }
+  }, [nav]);
+  const googleError = useCallback((reason) => setError(reason.message), []);
   function switchMode() {
     setError('');
     setMode(mode === 'login' ? 'register' : 'login');
@@ -142,6 +160,17 @@ export default function Login() {
               ? 'Iniciar sesión'
               : 'Crear cuenta'}
         </button>
+        {mode === 'login' && (
+          <>
+            <div className="auth-divider"><span>o</span></div>
+            <GoogleSignInButton
+              onCredential={googleLogin}
+              onError={googleError}
+              language={language}
+              disabled={busy}
+            />
+          </>
+        )}
         <button className="auth-switch" type="button" onClick={switchMode}>
           {mode === 'login'
             ? '¿No tiene cuenta? Registrarse'
