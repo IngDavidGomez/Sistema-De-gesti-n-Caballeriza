@@ -1,6 +1,7 @@
 package com.establo.exception;
 
 import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +28,8 @@ public class GlobalExceptionHandler {
     var errors=ex.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(e->e.getField(),e->Optional.ofNullable(e.getDefaultMessage()).orElse("Inválido"),(a,b)->a));
     return build(HttpStatus.BAD_REQUEST,"Datos inválidos",errors);
   }
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  ResponseEntity<ApiError> malformedJson(HttpMessageNotReadableException ex) { return build(HttpStatus.BAD_REQUEST,"Solicitud JSON inválida",Map.of()); }
   @ExceptionHandler(MaxUploadSizeExceededException.class)
   ResponseEntity<ApiError> fileTooLarge(MaxUploadSizeExceededException ex) { return build(HttpStatus.PAYLOAD_TOO_LARGE,"La imagen no puede superar 5 MB",Map.of()); }
   @ExceptionHandler(DataIntegrityViolationException.class)
