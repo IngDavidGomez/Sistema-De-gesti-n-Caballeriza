@@ -31,7 +31,7 @@ public class GoogleIdTokenService {
           || token.getSubject() == null || token.getSubject().isBlank())
         throw new BadCredentialsException("La cuenta de Google no tiene un correo verificado");
       return new GoogleProfile(token.getSubject(), email, name == null || name.isBlank() ? email : name);
-    } catch (JwtException | IllegalArgumentException exception) {
+    } catch (RuntimeException exception) {
       throw new BadCredentialsException("Token de Google inválido", exception);
     }
   }
