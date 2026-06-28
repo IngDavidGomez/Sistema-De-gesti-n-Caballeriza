@@ -6,12 +6,6 @@ import LoginHero from '../components/LoginHero';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 import { LanguageSelector, useI18n } from '../i18n';
 
-const DEMO_ACCOUNTS = [
-  ['Administrador', 'admin@establo.cr', 'Admin123!'],
-  ['Cuidador', 'cuidador@establo.cr', 'Cuidador123!'],
-  ['Veterinario', 'vet@establo.cr', 'Vet12345!'],
-  ['Cliente', 'cliente@establo.cr', 'Cliente123!'],
-];
 const LOGIN_LOGOS = {
   es: '/media/logo-establo-horizonte.png',
   en: '/media/logo-establo-horizonte-en.png',
@@ -20,10 +14,7 @@ const LOGIN_LOGOS = {
 
 export default function Login() {
   const { language } = useI18n();
-  const [form, setForm] = useState({
-      email: DEMO_ACCOUNTS[0][1],
-      password: DEMO_ACCOUNTS[0][2],
-    }),
+  const [form, setForm] = useState({ email: '', password: '' }),
     [mode, setMode] = useState('login'),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false);
@@ -95,23 +86,6 @@ export default function Login() {
             ? 'Ingrese sus credenciales para continuar'
             : 'Regístrese como cliente de la caballeriza'}
         </p>
-        {mode === 'login' && (
-          <div className="demo-accounts">
-            <span>PERFILES DE DEMOSTRACIÓN</span>
-            <div>
-              {DEMO_ACCOUNTS.map(([role, email, password]) => (
-                <button
-                  type="button"
-                  className={form.email === email ? 'active' : ''}
-                  key={role}
-                  onClick={() => setForm({ email, password })}
-                >
-                  {role}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
         {error && <div className="form-error">{error}</div>}
         {mode === 'register' && (
           <label>

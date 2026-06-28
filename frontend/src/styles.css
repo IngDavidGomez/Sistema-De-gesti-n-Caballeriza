@@ -2257,50 +2257,6 @@ tbody tr:hover {
   }
 }
 
-.demo-accounts {
-  margin: -10px 0 22px;
-}
-.demo-accounts > span {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--muted);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-}
-.demo-accounts > div {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 7px;
-}
-.demo-accounts button {
-  padding: 8px 7px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--surface-soft);
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 600;
-}
-.demo-accounts button:hover,
-.demo-accounts button.active {
-  border-color: #b68159;
-  background: #f4e8dc;
-  color: #87532f;
-  box-shadow: inset 0 0 0 1px rgba(184, 117, 66, 0.12);
-}
-:root[data-theme='dark'] .demo-accounts button {
-  border-color: #354556;
-  background: #171f2a;
-  color: #9ca8b5;
-}
-:root[data-theme='dark'] .demo-accounts button:hover,
-:root[data-theme='dark'] .demo-accounts button.active {
-  border-color: #895e40;
-  background: #35261d;
-  color: #e1ae7d;
-}
-
 /* Extended modules */
 .horse-thumb,
 .photo-placeholder {

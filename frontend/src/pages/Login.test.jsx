@@ -26,3 +26,16 @@ it('cambia el logotipo del login según el idioma seleccionado', () => {
   });
   expect(logo.getAttribute('src')).toBe('/media/logo-establo-horizonte.png');
 });
+
+it('no expone perfiles ni credenciales de demostración', () => {
+  render(
+    <LanguageProvider>
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    </LanguageProvider>
+  );
+  expect(screen.queryByText('PERFILES DE DEMOSTRACIÓN')).toBeNull();
+  expect(screen.getByLabelText('Correo electrónico').value).toBe('');
+  expect(screen.getByLabelText('Contraseña').value).toBe('');
+});
